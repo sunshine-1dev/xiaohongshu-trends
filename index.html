@@ -1,132 +1,102 @@
 <!DOCTYPE html>
-<html lang="zh-CN">
+<html lang="zh-CN" data-theme="light">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>小红书热点采集分析工具 | RedNote Trends</title>
+    <title>小红书热点趋势 | XHS Trends</title>
     <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>📕</text></svg>">
-    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@300;400;500;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
-    <div class="app">
-        <!-- Header -->
-        <header class="header">
-            <div class="header-left">
-                <span class="logo">📕</span>
-                <h1>RedNote Trends</h1>
-                <span class="subtitle">小红书热点采集分析工具</span>
+    <!-- Header -->
+    <header class="header">
+        <div class="header-inner">
+            <div class="logo">
+                <span class="logo-icon">📕</span>
+                <h1>小红书热点趋势</h1>
             </div>
-            <div class="header-right">
-                <button class="btn btn-refresh" onclick="app.refreshAll()">
-                    <span class="icon">🔄</span> 刷新数据
+            <div class="header-actions">
+                <div class="search-box">
+                    <svg class="search-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <circle cx="11" cy="11" r="8"></circle>
+                        <path d="m21 21-4.35-4.35"></path>
+                    </svg>
+                    <input type="text" id="searchInput" placeholder="搜索小红书热门话题..." autocomplete="off">
+                    <button id="searchBtn" class="search-btn" title="搜索">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M5 12h14M12 5l7 7-7 7"></path>
+                        </svg>
+                    </button>
+                </div>
+                <button id="themeToggle" class="theme-toggle" title="切换主题">
+                    <svg class="sun-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <circle cx="12" cy="12" r="5"></circle>
+                        <path d="M12 1v2M12 21v2M4.22 4.22l1.42 1.42M18.36 18.36l1.42 1.42M1 12h2M21 12h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42"></path>
+                    </svg>
+                    <svg class="moon-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path>
+                    </svg>
                 </button>
-                <button class="btn btn-export" onclick="app.exportData()">
-                    <span class="icon">📊</span> 导出报告
-                </button>
-            </div>
-        </header>
-
-        <!-- Stats Cards -->
-        <div class="stats-grid">
-            <div class="stat-card">
-                <div class="stat-icon">🔥</div>
-                <div class="stat-info">
-                    <div class="stat-value" id="totalPosts">--</div>
-                    <div class="stat-label">热门笔记</div>
-                </div>
-            </div>
-            <div class="stat-card">
-                <div class="stat-icon">💬</div>
-                <div class="stat-info">
-                    <div class="stat-value" id="totalComments">--</div>
-                    <div class="stat-label">评论总数</div>
-                </div>
-            </div>
-            <div class="stat-card">
-                <div class="stat-icon">❤️</div>
-                <div class="stat-info">
-                    <div class="stat-value" id="totalLikes">--</div>
-                    <div class="stat-label">总点赞</div>
-                </div>
-            </div>
-            <div class="stat-card">
-                <div class="stat-icon">📈</div>
-                <div class="stat-info">
-                    <div class="stat-value" id="trendingTopics">--</div>
-                    <div class="stat-label">热门话题</div>
-                </div>
             </div>
         </div>
+    </header>
 
-        <!-- Main Content -->
-        <div class="main-content">
-            <!-- Left: Category Analysis -->
-            <div class="panel category-panel">
-                <h2 class="panel-title">📊 热门类别分布</h2>
-                <div class="category-chart" id="categoryChart"></div>
-                <div class="category-list" id="categoryList"></div>
-            </div>
-
-            <!-- Right: Trending Posts -->
-            <div class="panel posts-panel">
-                <div class="panel-header">
-                    <h2 class="panel-title">🔥 实时热门笔记</h2>
-                    <div class="filter-tabs">
-                        <button class="tab active" onclick="app.filterPosts('all', this)">全部</button>
-                        <button class="tab" onclick="app.filterPosts('beauty', this)">美妆</button>
-                        <button class="tab" onclick="app.filterPosts('food', this)">美食</button>
-                        <button class="tab" onclick="app.filterPosts('travel', this)">旅行</button>
-                        <button class="tab" onclick="app.filterPosts('fashion', this)">穿搭</button>
-                        <button class="tab" onclick="app.filterPosts('lifestyle', this)">生活</button>
-                        <button class="tab" onclick="app.filterPosts('tech', this)">数码</button>
-                    </div>
-                </div>
-                <div class="posts-list" id="postsList"></div>
-            </div>
+    <!-- Stats Bar -->
+    <div class="stats-bar">
+        <div class="stats-inner">
+            <span class="stat-item">
+                <span class="stat-dot hot"></span>
+                <span id="feedCount">加载中...</span> 条热门内容
+            </span>
+            <span class="stat-divider">|</span>
+            <span class="stat-item">
+                <span class="stat-dot"></span>
+                更新于 <span id="lastUpdated">-</span>
+            </span>
+            <span class="stat-divider">|</span>
+            <span class="stat-item filter-group">
+                <button class="filter-btn active" data-filter="all">全部</button>
+                <button class="filter-btn" data-filter="normal">📷 图文</button>
+                <button class="filter-btn" data-filter="video">🎬 视频</button>
+            </span>
         </div>
+    </div>
 
-        <!-- Bottom Section -->
-        <div class="bottom-section">
-            <!-- Trending Keywords -->
-            <div class="panel keywords-panel">
-                <h2 class="panel-title">🏷️ 热门关键词云</h2>
-                <div class="keyword-cloud" id="keywordCloud"></div>
-            </div>
-
-            <!-- Comment Analysis -->
-            <div class="panel comments-panel">
-                <h2 class="panel-title">💬 热门评论分析</h2>
-                <div class="sentiment-bar">
-                    <div class="sentiment positive" id="sentimentPositive"></div>
-                    <div class="sentiment neutral" id="sentimentNeutral"></div>
-                    <div class="sentiment negative" id="sentimentNegative"></div>
-                </div>
-                <div class="sentiment-labels">
-                    <span class="label positive">😊 正面 <span id="posPercent"></span></span>
-                    <span class="label neutral">😐 中性 <span id="neuPercent"></span></span>
-                    <span class="label negative">😞 负面 <span id="negPercent"></span></span>
-                </div>
-                <div class="hot-comments" id="hotComments"></div>
-            </div>
-
-            <!-- Time Trend -->
-            <div class="panel trend-panel">
-                <h2 class="panel-title">📈 24小时热度趋势</h2>
-                <div class="trend-chart" id="trendChart"></div>
-            </div>
+    <!-- Main Content -->
+    <main class="main">
+        <div class="waterfall" id="waterfall">
+            <!-- Cards injected by JS -->
         </div>
+        <div class="loading" id="loading">
+            <div class="spinner"></div>
+            <p>加载热门内容中...</p>
+        </div>
+        <div class="empty" id="empty" style="display:none">
+            <div class="empty-icon">🔍</div>
+            <p>没有找到匹配的内容</p>
+        </div>
+    </main>
 
-        <!-- Post Detail Modal -->
-        <div class="modal" id="postModal">
-            <div class="modal-content">
-                <button class="modal-close" onclick="app.closeModal()">✕</button>
-                <div id="modalBody"></div>
+    <!-- Modal -->
+    <div class="modal-overlay" id="modalOverlay">
+        <div class="modal" id="modal">
+            <button class="modal-close" id="modalClose">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+                    <path d="M18 6 6 18M6 6l12 12"></path>
+                </svg>
+            </button>
+            <div class="modal-body" id="modalBody">
+                <!-- Content injected by JS -->
             </div>
         </div>
     </div>
 
-    <script src="data.js"></script>
+    <!-- Footer -->
+    <footer class="footer">
+        <p>数据来源：<a href="https://www.xiaohongshu.com/explore" target="_blank" rel="noopener">小红书探索页</a> · 仅供学习研究使用</p>
+        <p class="footer-sub">Built with ❤️ by <a href="https://github.com/sunshine-1dev" target="_blank" rel="noopener">sunshine-1dev</a></p>
+    </footer>
+
     <script src="app.js"></script>
 </body>
 </html>
